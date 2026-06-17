@@ -156,8 +156,6 @@ return 'succeeded' if all went well and 'failed' if no change has happened (id n
 
 - update_mission_status(id, status)->str:
 update the mission status by id
-
-update the assigned_agent_id of m_id to a_id
 return 'succeeded' if all went well and 'failed' if no change has happened (id not exists).
 (# *note* its much better to return 'true' or 'false' because the end-user does not call this function. I return string due the instructions and might change it in day 2 due the end-user platform)
 

@@ -4,7 +4,7 @@ connect with the table  `agents`
 
 """
 from database.db_connection import ConnectionDB
-
+from database.mission_db import MissionDB
 
 class AgentDB:
     """
@@ -23,6 +23,7 @@ class AgentDB:
         self.succeeded_msg = 'succeeded'
         # this what the create, update and delete function return if nothing update (row was not found)
         self.failed_msg = 'failed'
+        self.mission_table_manager = MissionDB()
 
     def create_agent(self, data: dict) -> dict:
         """
@@ -174,6 +175,12 @@ class AgentDB:
             return None
         failed = agent_data['failed_missions']
         completed = agent_data['completed_missions']
+        total = self.mission_table_manager.count_missions_by_agents(id=id)
+        success_rate = 0 if total == 0 else (completed / total)*100
+        return {'failed':failed,
+                'completed':completed,
+                'total':total,
+                "success_rate":success_rate}
 
     def count_active_agents(self)->int:
         """
@@ -205,3 +212,4 @@ if __name__ == "__main__":
     print(a.increment_completed(id=3))
     print(a.increment_failed(id=4))
     print(a.count_active_agents())
+    print(a.get_agent_performance(3))
