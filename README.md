@@ -82,7 +82,7 @@ create (save to database) an agent and return its object [its data dict as its i
 
 (*note* since we did NOT asked for represent the agents as class objects when we load from database, I assume that 'agent object' refer to the dict of data that we save and load from database)
 
-- get_all_missions()->list[dict]
+- get_all_agents()->list[dict]
 
 return all of the agents dicts 
 
