@@ -128,7 +128,7 @@ success_rate: (completed/total) * 100 (***note*** logic problem, if we use total
 return the number of the active agents
 
 
-**AgentDB**
+**MissionDB**
 manage all of the action needed with the table `missions`
 
 *note* this class DOES NOT responsible for Validation and Error handling 
