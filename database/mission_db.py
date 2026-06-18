@@ -179,13 +179,27 @@ class MissionDB:
         """
         return how many mission with given status
         """
-        return self._count(key='status', value=[status])
+        return self._count(key='status', values=[status])
     
     def count_open_missions(self)->int:
         return self._count(key="status", values=self._open_status)
     
     def count_critical_missions(self)->int:
         return self._count(key="risk_level", values=['CRITICAL'])
+    
+    def get_top_agent(self)->int|None:
+        query = f"""
+                SELECT assigned_agent_id from missions 
+                WHERE status="COMPLETED";
+                """
+        with self._connect() as conn:
+            with conn.cursor(dictionary=True) as crs:
+                crs.execute(query)
+                response = crs.fetchall()
+                if response == []:
+                    return None
+                
+        
 
 if __name__ == "__main__":
     m = MissionDB()

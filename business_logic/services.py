@@ -130,3 +130,39 @@ class Services:
         validations.valid_cancel_mission(mission=mission)
         self._mission_db.update_mission_status(id=id, status="CANCELLED")
         return {"message": f"mission id-> {id} : status updated"}
+    
+    def get_summary(self):
+        active_agents = self._agent_db.count_active_agents()
+        total_missions = self._mission_db.count_all_missions()
+        open_missions = self._mission_db.count_open_missions()
+        completed_missions = self._mission_db.count_by_status(status="COMPLETED")
+        failed_missions = self._mission_db.count_by_status(status="FAILED")
+        critical_missions = self._mission_db.count_critical_missions()
+
+        return {
+                "active_agents_count": active_agents,
+                "total_missions": total_missions,
+                "open_missions": open_missions,
+                "completed_missions": completed_missions,
+                "failed_missions": failed_missions,
+                "critical_missions": critical_missions
+                }
+    def get_by_status(self):
+        open = self._mission_db.count_open_missions()
+        in_progress = self._mission_db.count_by_status(status="IN_PROGRESS")
+        completed = self._mission_db.count_by_status(status="COMPLETED")
+        failed = self._mission_db.count_by_status(status="FAILED")
+        canceled =  self._mission_db.count_by_status(status="CANCELED")
+        return {
+                "open": open,
+                "in_progress": in_progress,
+                "completed": completed,
+                "failed": failed,
+                "canceled": canceled
+                }
+    
+    def get_top_agent(self):
+        agent_id = self._mission_db.get_top_agent()
+        if agent_id is None:
+            raise exceptions.AgentNotExists
+        return self.get_agent_by_id(agent_id)
