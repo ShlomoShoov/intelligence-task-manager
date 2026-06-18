@@ -9,7 +9,7 @@ from database.mission_db import MissionDB
 import business_logic.exceptions as exceptions
 import business_logic.models as models
 import business_logic.validations as validations
-
+from typing import Counter
 
 class Services:
     """
@@ -53,13 +53,13 @@ class Services:
         response = self._agent_db.update_agent(id=id, data=data.model_dump())
         if response == self._agent_db.failed_msg:
             raise exceptions.AgentNotExists
-        return {"massage": f"{id} updated!"}
+        return {"message": f"{id} updated!"}
 
     def deactivate_agent(self, id: int):
         response = self._agent_db.deactivate_agent(id=id)
         if response == self._agent_db.failed_msg:
             raise exceptions.AgentNotExists
-        return {"massage": f"{id} deactivate!"}
+        return {"message": f"{id} deactivate!"}
 
     def get_agent_performance(self, id: int) -> dict:
         response = self._agent_db.get_agent_performance(id=id)
@@ -84,7 +84,7 @@ class Services:
         data = data.model_dump()
         data['risk_level'] = risk_level
         response = self._mission_db.create_mission(data)
-        return {"massage": "Mission created", "data": response}
+        return {"message": "Mission created", "data": response}
 
     def get_missions(self) -> list[dict]:
         return self._mission_db.get_all_missions()
@@ -103,7 +103,7 @@ class Services:
             raise exceptions.AgentOverTheMissionsLimit
         self._mission_db.assign_mission(m_id=m_id, a_id=a_id)
         self._mission_db.update_mission_status(id=m_id,status = "ASSIGNED")
-        return {"massage": f"mission {m_id} assign to agent {a_id}"}
+        return {"message": f"mission {m_id} assign to agent {a_id}"}
 
     def start_mission(self, id: int):
         mission = self.get_mission_by_id(id)
