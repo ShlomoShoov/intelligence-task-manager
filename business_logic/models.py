@@ -18,3 +18,5 @@ class MissionModel(BaseModel):
     location: str 
     difficulty: int 
     importance: int
+
+

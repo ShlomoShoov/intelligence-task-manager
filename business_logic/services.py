@@ -22,6 +22,7 @@ class Services:
         self._agent_db = AgentDB()
         self._mission_db = MissionDB()
         self._success_msg = 'success'
+        self.max_mission_to_agent = 3
 
     #  agent methods:
 
@@ -69,8 +70,8 @@ class Services:
     # missions route
     def _calc_risk_level(self, difficulty, importance):
         return difficulty*2 + importance
-    
-    def _get_risk_level(self,risk_number:int):
+
+    def _get_risk_level(self, risk_number: int):
         return "CRITICAL" if risk_number >= 25 else "HIGH" if risk_number >= 18 else "MEDIUM" if risk_number >= 10 else "LOW"
 
     def create_mission(self, data: models.MissionModel):
@@ -78,17 +79,54 @@ class Services:
             raise exceptions.InvalidDifficulty
         if not validations.valid_importance(importance=data.importance):
             raise exceptions.InvalidImportance
-        risk_level = self._get_risk_level(self._calc_risk_level(difficulty=data.difficulty, importance=data.importance))
+        risk_level = self._get_risk_level(self._calc_risk_level(
+            difficulty=data.difficulty, importance=data.importance))
         data = data.model_dump()
         data['risk_level'] = risk_level
         response = self._mission_db.create_mission(data)
-        return {"massage":"Mission created", "data":response}
-    
-    def get_missions(self)->list[dict]:
+        return {"massage": "Mission created", "data": response}
+
+    def get_missions(self) -> list[dict]:
         return self._mission_db.get_all_missions()
 
-    def get_mission_by_id(self, id:int):
+    def get_mission_by_id(self, id: int):
         response = self._mission_db.get_mission_by_id(id=id)
         if response is None:
             raise exceptions.MissionNotExists
         return response
+
+    def assign_mission(self, m_id: int, a_id: int):
+        agent = self.get_agent_by_id(a_id)
+        mission = self.get_mission_by_id(m_id)
+        validations.valid_assign_mission(mission=mission, agent=agent)
+        if self._mission_db.count_missions_by_agents(id=a_id) >= self.max_mission_to_agent:
+            raise exceptions.AgentOverTheMissionsLimit
+        self._mission_db.assign_mission(m_id=m_id, a_id=a_id)
+        self._mission_db.update_mission_status(id=m_id,status = "ASSIGNED")
+        return {"massage": f"mission {m_id} assign to agent {a_id}"}
+
+    def start_mission(self, id: int):
+        mission = self.get_mission_by_id(id)
+        validations.valid_start_mission(mission=mission)
+        self._mission_db.update_mission_status(id=id, status="IN_PROGRESS")
+        return {"message": f"mission id-> {id} : status updated"}
+
+    def complete_mission(self, id):
+        mission = self.get_mission_by_id(id)
+        validations.valid_complete_mission(mission=mission)
+        self._mission_db.update_mission_status(id=id, status="COMPLETED")
+        self._agent_db.increment_completed(mission["assigned_agent_id"])
+        return {"message": f"mission id-> {id} : status updated"}
+
+    def failed_mission(self, id):
+        mission = self.get_mission_by_id(id)
+        validations.valid_complete_mission(mission=mission)
+        self._mission_db.update_mission_status(id=id, status="FAILED")
+        self._agent_db.increment_failed(mission["assigned_agent_id"])
+        return {"message": f"mission id-> {id} : status updated"}
+
+    def cancel_mission(self, id):
+        mission = self.get_mission_by_id(id)
+        validations.valid_cancel_mission(mission=mission)
+        self._mission_db.update_mission_status(id=id, status="CANCELLED")
+        return {"message": f"mission id-> {id} : status updated"}

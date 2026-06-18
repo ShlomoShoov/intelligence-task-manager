@@ -82,3 +82,4 @@ def get_performance(id:int):
         logger.error(f"Agent not found, id: {id}")
         raise HTTPException(status_code=404, detail={
                             "message": f"id not found: {id}"})
+    
