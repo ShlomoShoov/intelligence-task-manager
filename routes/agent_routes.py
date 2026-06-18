@@ -44,12 +44,13 @@ def get_by_id(id: int):
                             "message": f"id not found: {id}"})
 
 
-@router.post("/{id}")
+@router.put("/{id}")
 def update_agent(id: int, new_data: models.AgentModel):
     logger.info(f"called PUT agent/{id}")
     try:
         response = service.update_agent(id=id, data=new_data)
-        logger.info(response["massage"])
+        logger.info(response["message"])
+        return response
     except exceptions.RankInvalid:
         logger.error(f"Got undefined rank: {new_data.agent_rank}")
         raise HTTPException(status_code=400, detail={
@@ -65,7 +66,7 @@ def deactivate_id(id: int):
     logger.info(f"called PUT agents/{id}/deactivate ")
     try:
         response = service.deactivate_agent(id=id)
-        logger.info(response["massage"])
+        logger.info(response["message"])
         return response
 
     except exceptions.AgentNotExists:
