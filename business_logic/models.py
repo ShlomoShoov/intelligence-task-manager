@@ -12,3 +12,9 @@ class AgentModel(BaseModel):
     agent_rank: str
     specialty: str
 
+class MissionModel(BaseModel):
+    title: str
+    description: str
+    location: str 
+    difficulty: int 
+    importance: int

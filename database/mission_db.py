@@ -24,7 +24,7 @@ class MissionDB:
         self.failed_msg = 'failed'
         self.no_update = 'no_update'
 
-        self._open_status = ['NEW' , 'ASSIGNED' , 'IN_PROGRESS']
+        self._open_status = [ 'ASSIGNED' , 'IN_PROGRESS']
 
     
     def _is_id_exists(self,cursor, id:int):

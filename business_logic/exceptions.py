@@ -8,3 +8,12 @@ class RankInvalid(Exception):
 
 class AgentNotExists(Exception):
     pass
+
+class InvalidDifficulty(Exception):
+    pass
+
+class InvalidImportance(Exception):
+    pass
+
+class MissionNotExists(Exception):
+    pass
