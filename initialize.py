@@ -3,7 +3,7 @@ this file init the project in the first time
 """
 
 from database.db_connection import ConnectionDB
-
+from logs.config_logging import config
 
 connection = ConnectionDB()
 def init():
@@ -12,3 +12,4 @@ def init():
     """
     connection.create_database()
     connection.create_tables()
+    config()

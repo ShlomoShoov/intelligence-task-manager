@@ -23,7 +23,14 @@ class AgentDB:
         self.succeeded_msg = 'succeeded'
         # this what the create, update and delete function return if nothing update (row was not found)
         self.failed_msg = 'failed'
+        self.no_update = 'no_update'
         self.mission_table_manager = MissionDB()
+
+    def _is_id_exists(self,cursor, id:int):
+        query = f"SELECT * FROM {self.table_name} WHERE id=%s"
+        cursor.execute(query, (id,))
+        response = cursor.fetchone()
+        return response is not None
 
     def create_agent(self, data: dict) -> dict:
         """
@@ -58,7 +65,7 @@ class AgentDB:
                 data = crs.fetchall()
         return data
 
-    def get_agent_by_id(self, id: int) -> dict | None:
+    def get_agent_by_id(self,id:int) -> dict | None:
         """
         return an agent dict by id, if not exists return None
         """
@@ -88,6 +95,8 @@ class AgentDB:
 
         with self._connect() as conn:
             with conn.cursor() as crs:
+                if not self._is_id_exists(cursor=crs, id=id):
+                    return self.failed_msg
                 crs.execute(query, values)
                 has_update = crs.rowcount > 0
                 conn.commit()
@@ -95,7 +104,7 @@ class AgentDB:
         if has_update:
             return self.succeeded_msg
         else:
-            return self.failed_msg
+            return self.no_update
         
     def deactivate_agent(self,id:int)->str:
         """

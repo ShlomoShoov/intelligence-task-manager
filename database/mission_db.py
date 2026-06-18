@@ -22,10 +22,16 @@ class MissionDB:
         self.succeeded_msg = 'succeeded'
         # this what the create, update and delete function return if nothing update (row was not found)
         self.failed_msg = 'failed'
+        self.no_update = 'no_update'
 
         self._open_status = ['NEW' , 'ASSIGNED' , 'IN_PROGRESS']
 
-        
+    
+    def _is_id_exists(self,cursor, id:int):
+        query = f"SELECT * FROM {self.table_name} WHERE id=%s"
+        cursor.execute(query, (id,))
+        response = cursor.fetchone()
+        return response is not None
 
     def create_mission(self, data:dict)->dict|None:
         """
@@ -91,6 +97,8 @@ class MissionDB:
 
         with self._connect() as conn:
             with conn.cursor() as crs:
+                if not self._is_id_exists(cursor=crs, id=id):
+                    return self.failed_msg
                 crs.execute(query, values)
                 has_update = crs.rowcount > 0
                 conn.commit()
@@ -98,7 +106,7 @@ class MissionDB:
         if has_update:
             return self.succeeded_msg
         else:
-            return self.failed_msg
+            return self.no_update
         
 
     def assign_mission(self, m_id:int, a_id:int)->str:

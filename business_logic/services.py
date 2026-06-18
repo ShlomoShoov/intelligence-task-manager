@@ -53,8 +53,17 @@ class Services:
             raise exceptions.AgentNotExists
         return {"massage":f"{id} updated!"}
     
+    def deactivate_agent(self, id:int):
+        response = self._agent_db.deactivate_agent(id=id)
+        if response == self._agent_db.failed_msg:
+            raise exceptions.AgentNotExists
+        return {"massage":f"{id} deactivate!"}
     
-    
+    def get_agent_performance(self, id:int)->dict:
+        response = self._agent_db.get_agent_performance(id=id)
+        if response is None:
+            raise exceptions.AgentNotExists
+        return response
         
 
         
