@@ -1,9 +1,9 @@
 # Intelligence Task Manager 
 
 
-## Part 1 - Day 1 - The Data Base
+## Part 1 - Day 1 - The Data Base Layer
 ------
-### Project description
+### description
 the `Intelligence Task Manager` manage agents and missions, and allow crate, update, and read data in organize way using MySql as the main data base.
 ------
 ### Folder Structure
@@ -223,20 +223,35 @@ must to import and run the function yourself.
 
 **run those commands**
 
-````
+`
 git clone https://github.com/ShlomoShoov/intelligence-task-manager
-```
+`
 
-```
+`
 docker run -d --name intelligence-mysql -e MYSQL_ROOT_PASSWORD=1234 
   -e MYSQL_DATABASE=Intelligence_db -p 3306:3306 mysql:8.0
-```
+`
 
-```
+`
 docker start intelligence-mysql
-```
+`
+
+*make sure you are in the project folder before running those commands*
+`
+python -m venv .venv
+`
+
+`
+pip install -r requirements.txt
+`
+
+
+
+
 
 ***now, you can use the data base layer***
+
+
 
 *simple example for agent db*
 
@@ -253,5 +268,94 @@ print(agent_db.get_all_agents())
 
 
 ```
+
+
+## Part two - Day Two -  API layer 
+
+The API layer contain the end-user platform.
+it contains two important things
+1. routers with end-points
+2. business  logic and error handling
+
+
+### end points
+
+**Agents endpoints**
+1. *POST* agents/ 
+2. *GET* agents/
+3. *GET* /agents/{id}
+4. *PUT* /agents/{id}
+5. *PUT* /agents/{id}/deactivate
+6. *GET* /agents/{id}/performance 
+
+
+**Missions endpoints**
+1. *POST* /missions
+2. *GET* / missions
+3. *GET* /missions/{id}
+4. *PUT* /missions/{id}/assign/{agent_id}
+5. *PUT* /missions/{id}/start
+6. *PUT*  /missions/{id}/complete
+7. *PUT* /missions/{id}/fail 
+8. *PUT* /missions/{id}/cancel
+
+
+**Reports endpoints**
+1. *GET* /summary/reports
+2.  *GET* /reports/missions-by-status
+3.  *GET* /reports/top-agent
+
+
+
+### System Flow
+- **create agent**
+1. user send `post request` using *POST* agents with the data
+2. the router in `agent_routes` got the request and send it to `services`
+3. `services` valid the request (if anything wrong-> sent error in this point) if everything all right send to `AgentDB` 
+4. `AgentDB` create the agent
+
+**create mission**
+`/missions [ POST]` -> `mission_routes` -> `services.crate_mission(data)` -> `validation`(if needed) -> `MissionDB`
+
+**assign mission**
+`/missions/{id}/assign/{agent_id}` -> `mission_routes` -> `services.assign_mission(m,a)` -> `validation.assign`-> `MissionDB.assign`
+
+
+
+
+### ***HOW TO RUN THE API SERVER***
+
+**run those commands to set everything up**
+
+`
+git clone https://github.com/ShlomoShoov/intelligence-task-manager
+`
+
+`
+docker run -d --name intelligence-mysql -e MYSQL_ROOT_PASSWORD=1234 
+  -e MYSQL_DATABASE=Intelligence_db -p 3306:3306 mysql:8.0
+`
+
+`
+docker start intelligence-mysql
+`
+
+*make sure you are in the project folder before running those commands*
+`
+python -m venv .venv
+`
+
+`
+pip install -r requirements.txt
+`
+
+
+***now everything set up!***
+
+**run the APIserver**
+
+`
+python main.py
+`
 
 
